@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить новый населенный пункт</title>
+</head>
+<body>
+    <h1>{% block title %} Добавить новый населенный пункт {% endblock %}</h1>
+    <form method="post">
+        <label for="district">Район</label>
+        <br>
+        <input type="text" name="district"
+               placeholder="Район"
+               value="{{ request.form['district'] }}"></input>
+        <br>
+
+        <label for="town">Населенный пункт</label>
+        <br>
+        <input name="town"
+                  placeholder="Населенный пункт"
+                  value=" {{ request.form['town'] }}"></input>
+        <br>
+        <button type="submit">Добавить</button>
+    </form>
+</body>
+</html>
