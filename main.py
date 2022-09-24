@@ -101,7 +101,10 @@ could be defined globally
 def update_dropdown():
     # the value of the first dropdown (selected by the user)
     selected_class = request.args.get('selected_class', type=str)
-
+    #selected_entry = request.args.get('selected_enrty', type=str)
+    #print(selected_class)
+    #print(selected_entry)
+    #print(selected_class) - > 'Mitsubishi'
     # get values for the second dropdown
     updated_values = get_dropdown_values()[selected_class]
 
@@ -111,6 +114,21 @@ def update_dropdown():
         html_string_selected += '<option value="{}">{}</option>'.format(entry, entry)
 
     return jsonify(html_string_selected=html_string_selected)
+
+@app.route('/_update_towns')
+def update_towns():
+    # the value of the second dropdown (selected by the user)
+    selected_entry = request.args.get('selected_entry', type=str)
+    print(selected_entry)
+    # get values for the second dropdown
+    #updated_values = get_dropdown_values()[selected_class]
+
+    # create the value sin the dropdown as a html string
+    #html_string_selected = ''
+    #for entry in updated_values:
+    #    html_string_selected += '<option value="{}">{}</option>'.format(entry, entry)
+
+    return jsonify(html_string_towns="")
 
 
 @app.route('/_process_data')
@@ -122,9 +140,19 @@ def process_data():
     #print(selected_entry)
     sel = Carmodels.query.filter_by(car_model=selected_entry).first().model_id
     selected_towns = Towns.query.with_entities(Towns.town_name, Towns.carmodel_id).filter_by(carmodel_id=sel)
-    res = map(lambda x: x[0], selected_towns.all())
-    res = list(res)
-    res = '\n'.join(res)
+    #print(selected_towns.all())
+    res = selected_towns.all()
+    #print(res)
+    for i in range(len(res)):
+        t = res[i]
+        t = list(t)
+        t[1] = selected_entry
+        res[i] = t
+    #dis_id = map(lambda x: x[1]=selected_entry, res)
+    #res = list(res)
+    #print(res)
+    if len(res)>1:
+        res = ';'.join(res)
     # process the two selected values here and return the response; here we just create a dummy string
 
     return jsonify(
@@ -201,8 +229,16 @@ def edittown():
         district = request.form['district']
         town = request.form['town']
         newtown = request.form['newtown']
-        sel = Carmodels.query.filter_by(car_model=district)
+        population = request.form['population']
+        newtype = request.form['type']
+        population = int(population)
         print(newtown)
+        print(population)
+        print(newtype)
+
+        sel = Carmodels.query.filter_by(car_model=district)
+        newtown = newtown[1:]
+        newtype = newtype[1:]
         if not district:
             flash('Введите название района!')
         elif sel.first()==None:
@@ -210,8 +246,15 @@ def edittown():
         elif not town:
             flash('Введите название населенного пункта')
         else:
-            Towns.update().values(town_name=newtown).where(town_name =town)
-            Towns.query.filter_by(town_name=town).update({'town_name': newtown})
+            town = town[1:]
+            sel = Towns.query.filter_by(town_name=town).first().town_id
+            sel_dis = Towns.query.filter_by(town_name=town).first().carmodel_id
+            selected_towns = Towns.query.with_entities(Towns.town_name, Towns.carmodel_id).filter_by(town_id=sel).first()
+            #Towns.query.filter_by(town_name=town).delete()
+            print(selected_towns)
+            #print(newtown)
+            newt = Towns(selected_towns[1], newtown)
+            db.session.add(newt)
             db.session.commit()
             return redirect(url_for('index'))
     return render_template('edittown.html')

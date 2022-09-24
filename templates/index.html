@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
   </head>
@@ -37,6 +37,11 @@
         Выберете облать и район.
       </div>
     </div>
+    </div>
+      {% for o in all_towns %}
+        <p>{{ o }}</p>
+      {% endfor %}
+    </div>
 
     <p><a href="http://127.0.0.1:5000/addtown">Добавить населенный пункт</a></p>
 
@@ -49,28 +54,26 @@
       $(document).ready(function() {
 
         $('#all_classes').change(function(){
-
           $.getJSON('/_update_dropdown', {
             selected_class: $('#all_classes').val()
-
+            //selected_entry: $('#all_entries').val()
           }).success(function(data) {
-                $('#all_entries').html(data.html_string_selected);
-           })
+            $('#all_entries').html(data.html_string_selected);
+          })
         });
-        $('#process_input').bind('click', function() {
 
+        $('#process_input').bind('click', function() {
             $.getJSON('/_process_data', {
                 selected_class: $('#all_classes').val(),
                 selected_entry: $('#all_entries').val(),
-                selecter_towns: $('#all_towns').val()
-
             }).success(function(data) {
                 $('#processed_results').text(data.random_text);
             })
           return false;
-
         });
+
       });
+
     </script>
   </body>
 </html>

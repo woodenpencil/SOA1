@@ -20,11 +20,23 @@
                   placeholder="Населенный пункт"
                   value=" {{ request.form['town'] }}"></input>
         <br>
-        <label for="town">Новое имя</label>
+        <label for="newtown">Новое имя</label>
         <br>
         <input type="text" name="newtown"
                   placeholder="Новое имя"
                   value=" {{ request.form['newtown'] }}"></input>
+        <br>
+        <label for="population">Новое население</label>
+        <br>
+        <input type="text" name="population"
+                  placeholder="Новое население"
+                  value=" {{ request.form['population'] }}"></input>
+        <br>
+        <label for="type">Новый тип</label>
+        <br>
+        <input type="text" name="type"
+                  placeholder="Новый тип"
+                  value=" {{ request.form['type'] }}"></input>
         <br>
         <button type="submit">Редактировать</button>
     </form>
