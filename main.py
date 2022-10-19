@@ -174,6 +174,8 @@ def index():
                            all_classes=default_classes,
                            all_entries=default_values)
 
+
+
 @app.route('/addtown', methods=('GET', 'POST'))
 def addtown():
     """
