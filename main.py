@@ -114,46 +114,22 @@ def update_dropdown():
         html_string_selected += '<option value="{}">{}</option>'.format(entry, entry)
 
     return jsonify(html_string_selected=html_string_selected)
-'''
-@app.route('/_update_towns')
-def update_towns():
-    # the value of the second dropdown (selected by the user)
-    selected_entry = request.args.get('selected_entry', type=str)
-    print(selected_entry)
-    # get values for the second dropdown
-    #updated_values = get_dropdown_values()[selected_class]
 
-    # create the value sin the dropdown as a html string
-    #html_string_selected = ''
-    #for entry in updated_values:
-    #    html_string_selected += '<option value="{}">{}</option>'.format(entry, entry)
-
-    return jsonify(html_string_towns="")
-'''
 
 @app.route('/_process_data')
 def process_data():
     selected_class = request.args.get('selected_class', type=str)
     selected_entry = request.args.get('selected_entry', type=str)
-    selected_towns = request.args.get('selected_town', type=str)
-    #print(selected_class)
-    #print(selected_entry)
     sel = Districts.query.filter_by(region_name=selected_entry).first().district_id
     selected_towns = Towns.query.with_entities(Towns.town_name, Towns.district_id, Towns.town_type, Towns.population).filter_by(district_id=sel)
-    #print(selected_towns.all())
     res = selected_towns.all()
-    #print(res)
+
     for i in range(len(res)):
         t = res[i]
         t = list(t)
         t[1] = selected_entry
         res[i] = t
-    #dis_id = map(lambda x: x[1]=selected_entry, res)
-    #res = list(res)
     print(res)
-    #if len(res)>1:
-    #    res = ';'.join(res)
-    # process the two selected values here and return the response; here we just create a dummy string
 
     return jsonify(
         random_text="Вы выбрали {} область {} район.{}".format(selected_class, selected_entry, res))
@@ -182,8 +158,11 @@ def addtown():
     if request.method == 'POST':
         district = request.form['district']
         town = request.form['town']
+        town_type = request.form['town_type']
+        population = int(request.form['population'])
         sel = Districts.query.filter_by(region_name=district)
-
+        town = town[1:]
+        town_type = town_type[1:]
         if not district:
             flash('Введите название района!')
         elif sel.all()==[]:
@@ -191,11 +170,17 @@ def addtown():
         elif not town:
             flash('Введите название населенного пункта')
         else:
-            newtown = Towns(sel.first().district_id, town)
-            db.session.add(newtown)
-            db.session.commit()
-            return redirect(url_for('index'))
-
+            #newtown = Towns(sel.first().district_id, town, town_type, population)
+            #db.session.add(newtown)
+            #db.session.commit()
+            #return redirect(url_for('index'))
+            from suds.client import Client
+            print("Connecting to Service...")
+            wsdl = "http://localhost:8733/Design_Time_Addresses/WcfServiceLibrary1/Service1/?wsdl"
+            client = Client(wsdl)
+            # print client
+            result = client.service.AddTown(sel.first().district_id, town, town_type, population)
+            print(result)
     return render_template('addtown.html')
 
 
@@ -207,6 +192,7 @@ def deletetown():
     if request.method == 'POST':
         district = request.form['district']
         town = request.form['town']
+        town = town[1:]
         sel = Districts.query.filter_by(region_name=district)
         if not district:
             flash('Введите название района!')
@@ -232,9 +218,6 @@ def edittown():
         population = request.form['population']
         newtype = request.form['type']
         population = int(population)
-        #print(newtown)
-        #print(population)
-        #print(newtype)
 
         sel = Districts.query.filter_by(region_name=district)
         newtown = newtown[1:]
@@ -248,11 +231,9 @@ def edittown():
         else:
             town = town[1:]
             sel = Towns.query.filter_by(town_name=town).first().town_id
-            sel_dis = Towns.query.filter_by(town_name=town).first().district_id
             selected_towns = Towns.query.with_entities(Towns.town_name, Towns.district_id).filter_by(town_id=sel).first()
             Towns.query.filter_by(town_name=town).delete()
-            print(selected_towns)
-            #print(newtown)
+
             newt = Towns(selected_towns[1], newtown, newtype, population)
             db.session.add(newt)
             db.session.commit()

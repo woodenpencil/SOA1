@@ -56,7 +56,6 @@
         $('#all_classes').change(function(){
           $.getJSON('/_update_dropdown', {
             selected_class: $('#all_classes').val()
-            //selected_entry: $('#all_entries').val()
           }).success(function(data) {
             $('#all_entries').html(data.html_string_selected);
           })

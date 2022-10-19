@@ -20,6 +20,21 @@
                   placeholder="Населенный пункт"
                   value=" {{ request.form['town'] }}"></input>
         <br>
+
+        <label for="town_type">Тип населенного пункта</label>
+        <br>
+        <input name="town_type"
+                  placeholder="Тип населенного пункта"
+                  value=" {{ request.form['town_type'] }}"></input>
+        <br>
+
+        <label for="population">Население</label>
+        <br>
+        <input name="population"
+                  placeholder="Население"
+                  value=" {{ request.form['population'] }}"></input>
+        <br>
+
         <button type="submit">Добавить</button>
     </form>
 </body>
