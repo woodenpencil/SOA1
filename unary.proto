@@ -11,8 +11,10 @@ service Unary{
 }
 
 message Message{
-
- string message = 1;
+ string district = 1;
+ string town = 2;
+ string town_type = 3;
+ int32 population = 4;
 }
 
 message MessageResponse{

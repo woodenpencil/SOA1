@@ -151,6 +151,34 @@ def index():
                            all_entries=default_values)
 
 
+import grpc
+import unary_pb2_grpc as pb2_grpc
+import unary_pb2 as pb2
+
+class UnaryClient(object):
+    """
+    Client for gRPC functionality
+    """
+
+    def __init__(self):
+        self.host = 'localhost'
+        self.server_port = 50051
+
+        # instantiate a channel
+        self.channel = grpc.insecure_channel(
+            '{}:{}'.format(self.host, self.server_port))
+
+        # bind the client and the server
+        self.stub = pb2_grpc.UnaryStub(self.channel)
+
+    def get_url(self, district, town, town_type, population):
+        """
+        Client function to call the rpc for GetServerResponse
+        """
+        message = pb2.Message(district=district, town=town, town_type=town_type, population=population)
+        print(f'{message}')
+        return self.stub.GetServerResponse(message)
+
 
 @app.route('/addtown', methods=('GET', 'POST'))
 def addtown():
@@ -172,17 +200,15 @@ def addtown():
         elif not town:
             flash('Введите название населенного пункта')
         else:
-            #newtown = Towns(sel.first().district_id, town, town_type, population)
-            #db.session.add(newtown)
-            #db.session.commit()
-            #return redirect(url_for('index'))
-            from suds.client import Client
-            print("Connecting to Service...")
-            wsdl = "http://localhost:8733/Design_Time_Addresses/WcfServiceLibrary1/Service1/?wsdl"
-            client = Client(wsdl)
-            # print client
-            result = client.service.AddTown(sel.first().district_id, town, town_type, population)
-            print(result)
+            client = UnaryClient()
+            result = client.get_url(district="district", town="town", town_type="town_type", population=42)
+            print(f'{result}')
+
+            newtown = Towns(sel.first().district_id, town, town_type, population)
+            db.session.add(newtown)
+            db.session.commit()
+            return redirect(url_for('index'))
+
     return render_template('addtown.html')
 
 
