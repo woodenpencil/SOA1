@@ -201,12 +201,12 @@ def addtown():
             flash('Введите название населенного пункта')
         else:
             client = UnaryClient()
-            result = client.get_url(district="district", town="town", town_type="town_type", population=42)
+            result = client.get_url(district=str(sel.first().district_id), town=str(town), town_type=str(town_type), population=int(population))
             print(f'{result}')
 
-            newtown = Towns(sel.first().district_id, town, town_type, population)
-            db.session.add(newtown)
-            db.session.commit()
+            #newtown = Towns(sel.first().district_id, town, town_type, population)
+            #db.session.add(newtown)
+            #db.session.commit()
             return redirect(url_for('index'))
 
     return render_template('addtown.html')
